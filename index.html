@@ -19,10 +19,13 @@
   <body>
     <div id="pano"></div>
     <script>
+      const lat = LAT_PLACEHOLDER;
+      const lng = LNG_PLACEHOLDER;
+
       const panorama = new google.maps.StreetViewPanorama(
         document.getElementById('pano'),
         {
-          position: { lat: 48.8584, lng: 2.2945 }, // Эйфелева башня
+          position: { lat: lat, lng: lng },
           pov: { heading: 165, pitch: 0 },
           zoom: 1
         }
