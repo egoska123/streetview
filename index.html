@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Google Street View</title>
+    <link rel="icon" href="data:,">
     <style>
       html, body {
         height: 100%;
@@ -14,24 +15,41 @@
         width: 100%;
       }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyANYtsM-aZ4zI6cJsiaqUtZguw79KnclAQ"></script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyANYtsM-aZ4zI6cJsiaqUtZguw79KnclAQ&loading=async&callback=initMap"></script>
   </head>
   <body>
     <div id="pano"></div>
     <script>
-      // Чтение координат из URL
-      const params = new URLSearchParams(window.location.search);
-      const lat = parseFloat(params.get('lat')) || 48.8584;
-      const lng = parseFloat(params.get('lng')) || 2.2945;
+      window.ReactNativeWebView.postMessage('HTML loaded');
+      function initMap() {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const lat = parseFloat(params.get('lat')) || 48.8584;
+          const lng = parseFloat(params.get('lng')) || 2.2945;
 
-      const panorama = new google.maps.StreetViewPanorama(
-        document.getElementById('pano'),
-        {
-          position: { lat: lat, lng: lng },
-          pov: { heading: 165, pitch: 0 },
-          zoom: 1
+          const position = { lat: lat, lng: lng };
+          const panorama = new google.maps.StreetViewPanorama(
+            document.getElementById('pano'),
+            {
+              position: position,
+              pov: { heading: 165, pitch: 0 },
+              zoom: 1
+            }
+          );
+
+          // Проверка доступности Street View
+          const service = new google.maps.StreetViewService();
+          service.getPanorama({ location: position, radius: 50 }, (data, status) => {
+            if (status === google.maps.StreetViewStatus.OK) {
+              window.ReactNativeWebView.postMessage('Street View available');
+            } else {
+              window.ReactNativeWebView.postMessage('Street View not available: ' + status);
+            }
+          });
+        } catch (error) {
+          window.ReactNativeWebView.postMessage('Error: ' + error.message);
         }
-      );
+      }
     </script>
   </body>
 </html>
